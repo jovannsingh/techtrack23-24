@@ -15,12 +15,12 @@
 		updateChart($selectedPlayer);
 	});
 
-	// Update chart on selectedPlayer change
+	// Update het diagram bij wijziging van geselecteerde speler
 	afterUpdate(() => {
 		updateChart($selectedPlayer);
 	});
 
-	// Update images on selectedPlayer change
+	// Update afbeeldingen bij wijziging van geselecteerde spele
 	afterUpdate(() => {
 		updateImages($selectedPlayer);
 	});
@@ -32,22 +32,23 @@
 		messiImage.style.boxShadow = 'none';
 		ronaldoImage.style.boxShadow = 'none';
 
-		// Toggle color effect based on selectedPlayer
+		// Wissel kleureffect gebaseerd op geselecteerde speler
 		if (player === 'Messi') {
-			messiImage.style.filter = '(100%)';
-			messiImage.style.boxShadow = '0 0px 15px #234cff';
+			// Glow effect for Messi
+			messiImage.style.filter = 'drop-shadow(0 0 10px #234cff)';
 		} else if (player === 'Ronaldo') {
-			ronaldoImage.style.filter = 'pink(100%)';
-			ronaldoImage.style.boxShadow = '0 0 15px #ff9000';
+			// Glow effect for Ronaldo
+			ronaldoImage.style.filter = 'drop-shadow(0 0 10px #ff9000)';
 		} else {
-			// Reset filters and box shadow if neither Messi nor Ronaldo is selected
-			messiImage.style.filter = '234cff(100%)';
-			ronaldoImage.style.filter = 'ff9000(100%)';
+			// Herstel filters en box shadow als niemand is geselecteerd
+			messiImage.style.filter = 'none';
+			ronaldoImage.style.filter = 'none';
 		}
 	}
 
+
 	function updateChart(player) {
-		// Remove existing chart elements
+		// Verwijder bestaande chart elementen
 		d3.select(elBarChart).selectAll('*').remove();
 		d3.select(elPieChart).selectAll('*').remove();
 		d3.select(elLineChart).selectAll('*').remove();
@@ -92,8 +93,8 @@
 			.style('height', (d) => height - y(d.Liga_Goals + d.CL_Goals))
 			.style('x', (d) => x(d.Season))
 			.style('y', (d) => y(d.Liga_Goals + d.CL_Goals))
-			.style('fill', '#FEBE10') // Custom color for Goals
-			// Add hover effect
+			.style('fill', '#FEBE10') // Custom kleur voor Goals
+			// Voeg hover effect
 			.on('mouseover', function (event, d) {
 				d3.select(this)
 					.transition()
@@ -119,14 +120,14 @@
 			.style('height', (d) => height - y(d.Liga_Aps + d.CL_Aps))
 			.style('x', (d) => x(d.Season) + x.bandwidth() / 2)
 			.style('y', (d) => y(d.Liga_Aps + d.CL_Aps))
-			.style('fill', '#38423B'); // Custom color for Appearances
+			.style('fill', '#38423B'); // Custom kleur voor Appearances
 
-		// Axes for Bar Chart
+		// Axes voor Bar Chart
 		svgBarChart.append('g').attr('transform', `translate(0, ${height})`).call(d3.axisBottom(x));
 
 		svgBarChart.append('g').call(d3.axisLeft(y));
 
-		// Titles for Bar Chart
+		// Titel voor Bar Chart
 		svgBarChart
 			.append('text')
 			.attr('x', width / 4)
@@ -316,9 +317,10 @@
 			.style('font-family', 'Roboto, sans-serif')
 			.style('font-weight', 'bold')
 			.style('fill', '#4CAF50')
-			.text('Market Value');
 	}
 </script>
+
+<!-- HTML Gedeelte -->
 
 <div>
 	<h1 style="text-align: center; margin-top: 50px; font-size: 24px; font-weight: bold; color: #333;">
@@ -352,8 +354,18 @@
 	<!-- Bar Chart Container -->
 	<div bind:this={elBarChart} />
 
+	<!-- Pie Chart Title -->
+	<h2 style="text-align: center; font-size: 20px; font-weight: bold; color: #00000;">
+		Liga and Champions League in Goals and Appearances
+	</h2>	
+
 	<!-- Pie Chart Container -->
 	<div bind:this={elPieChart} />
+
+	<!-- Line Chart Title -->
+	<h2 style="text-align: center; font-size: 20px; font-weight: bold; color: #38423B;">
+		Market Value over Time
+	</h2>	
 
 	<!-- Line Chart Container -->
 	<div bind:this={elLineChart} />
