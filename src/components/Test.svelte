@@ -295,14 +295,14 @@
 	<!-- Messi's afbeelding -->
 	<img
 		class={$selectedPlayer === 'Messi' ? 'glow messi' : 'messi'}
-		src="src/lib/images/messifoto.png"
+		src="https://www.transparentpng.com/download/messi/jCQ4CA-messi-wins-barcelona-the-milestone-match-steemit.png"
 		alt="Messi"
 	/>
 
 	<!-- Ronaldo's afbeelding -->
 	<img
 		class={$selectedPlayer === 'Ronaldo' ? 'glow ronaldo' : 'ronaldo'}
-		src="src/lib/images/ronaldofoto.png"
+		src="https://freepngimg.com/thumb/cristiano_ronaldo/21842-8-cristiano-ronaldo.png"
 		alt="Ronaldo"
 	/>
 </div>
