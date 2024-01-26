@@ -6,49 +6,19 @@
 
 	let elBarChart;
 	let elPieChart;
-	let messiImage;
-	let ronaldoImage;
-	let elLineChart; // Voeg de line chart container toe
+	let elLineChart;
 
 	// Initial chart setup
 	onMount(() => {
-		updateChart($selectedPlayer);
+		updateChart($selectedPlayer); // Het roept de functie updateChart($selectedPlayer) aan om het diagram in te stellen op basis van de momenteel geselecteerde speler
+	});
+
+	afterUpdate(() => {
+		updateChart($selectedPlayer); // Het roept de functie updateChart($selectedPlayer) aan om het diagram in te stellen op basis van de momenteel geselecteerde speler
 	});
 
 	// Update het diagram bij wijziging van geselecteerde speler
-	afterUpdate(() => {
-		updateChart($selectedPlayer);
-	});
-
-	// Update afbeeldingen bij wijziging van geselecteerde spele
-	afterUpdate(() => {
-		updateImages($selectedPlayer);
-	});
-
-	function updateImages(player) {
-		// Reset filters and box shadow
-		messiImage.style.filter = 'none';
-		ronaldoImage.style.filter = 'none';
-		messiImage.style.boxShadow = 'none';
-		ronaldoImage.style.boxShadow = 'none';
-
-		// Wissel kleureffect gebaseerd op geselecteerde speler
-		if (player === 'Messi') {
-			// Glow effect for Messi
-			messiImage.style.filter = 'drop-shadow(0 0 10px #234cff)';
-		} else if (player === 'Ronaldo') {
-			// Glow effect for Ronaldo
-			ronaldoImage.style.filter = 'drop-shadow(0 0 10px #ff9000)';
-		} else {
-			// Herstel filters en box shadow als niemand is geselecteerd
-			messiImage.style.filter = 'none';
-			ronaldoImage.style.filter = 'none';
-		}
-	}
-
-
 	function updateChart(player) {
-		// Verwijder bestaande chart elementen
 		d3.select(elBarChart).selectAll('*').remove();
 		d3.select(elPieChart).selectAll('*').remove();
 		d3.select(elLineChart).selectAll('*').remove();
@@ -69,11 +39,12 @@
 		const x = d3.scaleBand().range([0, width]).padding(0.1);
 		const y = d3.scaleLinear().range([height, 0]);
 
-		const filteredData = dataset.filter((d) => d.Player === player);
+		const filteredData = dataset.filter((d) => d.Player === player); //// Filter de dataset op de geselecteerde speler
 		const seasons = Array.from(new Set(filteredData.map((d) => d.Season)));
 
-		x.domain(seasons);
+		x.domain(seasons); // Stel het domein in voor de x-as (seizoenen)
 		y.domain([
+			// Stel het domein in voor de y-as (doelpunten)
 			0,
 			d3.max(
 				filteredData,
@@ -94,20 +65,21 @@
 			.style('x', (d) => x(d.Season))
 			.style('y', (d) => y(d.Liga_Goals + d.CL_Goals))
 			.style('fill', '#FEBE10') // Custom kleur voor Goals
+
 			// Voeg hover effect
 			.on('mouseover', function (event, d) {
 				d3.select(this)
 					.transition()
 					.duration(200)
-					.style('fill', '#77ff81')
-					.attr('height', (d) => height - y(d.Liga_Goals + d.CL_Goals) + 10); // Increase height on hover
+					.style('fill', '#4CAF50')
+					.attr('height', (d) => height - y(d.Liga_Goals + d.CL_Goals) + 10);
 			})
 			.on('mouseout', function (event, d) {
 				d3.select(this)
 					.transition()
 					.duration(200)
 					.style('fill', '#FEBE10')
-					.attr('height', (d) => height - y(d.Liga_Goals + d.CL_Goals)); // Restore original height on mouseout
+					.attr('height', (d) => height - y(d.Liga_Goals + d.CL_Goals));
 			});
 
 		svgBarChart
@@ -149,7 +121,6 @@
 			.text('Appearances');
 
 		// Pie Chart
-
 		const pieData = [
 			{ label: 'Liga Goals', value: filteredData.reduce((acc, d) => acc + d.Liga_Goals, 0) },
 			{ label: 'Liga Assists', value: filteredData.reduce((acc, d) => acc + d.Liga_Asts, 0) },
@@ -174,9 +145,9 @@
 				`translate(${(width + margin.left + margin.right) / 2},${
 					(height + margin.top + margin.bottom) / 2
 				})`
-			); // Centered
+			);
 
-		const piePaths = svgPieChart
+		svgPieChart
 			.selectAll('path.pie')
 			.data(pie(pieData))
 			.enter()
@@ -280,7 +251,7 @@
 			.append('circle')
 			.attr('cx', (d) => x(d.Season))
 			.attr('cy', (d) => y(d.Market_Value))
-			.attr('r', 5) // Radius van de cirkels
+			.attr('r', 5)
 			.attr('fill', '#4CAF50'); // Kleur van de cirkels
 
 		// Voeg de datalijn toe
@@ -289,9 +260,7 @@
 			.datum(filteredData)
 			.attr('class', 'line')
 			.attr('d', line)
-			.attr('fill', 'none')
-			.attr('stroke', '#4CAF50')
-			.attr('stroke-width', 2);
+			.attr('fill', 'none');
 
 		svgLineChart
 			.append('path')
@@ -299,52 +268,46 @@
 			.attr('d', line)
 			.attr('fill', 'none')
 			.attr('stroke', '#4CAF50')
-			.attr('stroke-width', 2)
-			.style('stroke', '#4CAF50') // Voeg de stijlregels hier toe
-			.style('stroke-width', '2');
+			.attr('stroke-width', 2);
 
-		// Axes for Line Chart
+		// Assen for Line Chart
 		svgLineChart.append('g').attr('transform', `translate(0, ${height})`).call(d3.axisBottom(x));
 
 		svgLineChart.append('g').call(d3.axisLeft(y));
 
-		// Title for Line Chart
+		// Titel voor Line Chart
 		svgLineChart
 			.append('text')
 			.attr('x', width / 2)
 			.attr('y', -margin.top / 2)
 			.attr('text-anchor', 'middle')
-			.style('font-family', 'Roboto, sans-serif')
-			.style('font-weight', 'bold')
-			.style('fill', '#4CAF50')
+			.style('fill', '#4CAF50');
 	}
 </script>
 
 <!-- HTML Gedeelte -->
 
 <div>
-	<h1 style="text-align: center; margin-top: 50px; font-size: 24px; font-weight: bold; color: #333;">
-		Who's the GOAT? Check the stats
-	</h1>
+	<h1>Who's the GOAT? Check the stats</h1>
 </div>
 
 <div class="image-wrapper">
 	<!-- Messi's afbeelding -->
 	<img
-		bind:this={messiImage}
-		src="https://www.transparentpng.com/download/messi/jCQ4CA-messi-wins-barcelona-the-milestone-match-steemit.png"
+		class={$selectedPlayer === 'Messi' ? 'glow messi' : 'messi'}
+		src="src/lib/images/messifoto.png"
 		alt="Messi"
 	/>
 
 	<!-- Ronaldo's afbeelding -->
 	<img
-		bind:this={ronaldoImage}
-		src="https://png2.cleanpng.com/sh/7a1523f0c5e20eca0a03150581daf1fd/L0KzQYm3VMI3N5tvj5H0aYP2gLBuTfNzcaR5gdN3bz31f7BojPRwNaF0iuZAZ3HvPbBolPlwdpJxRdh4b4Tlcb3zTgRmaZ4yTdNuMXG0QbOCU8hkbWgzSqg5OUOzQ4m4VcI1P2Q7Sqo8NkC3RHB3jvc=/kisspng-cristiano-ronaldo-portugal-national-football-team-5ae1a11b938ce7.2609303815247362836044.png"
+		class={$selectedPlayer === 'Ronaldo' ? 'glow ronaldo' : 'ronaldo'}
+		src="src/lib/images/ronaldofoto.png"
 		alt="Ronaldo"
 	/>
 </div>
 
-<div style="text-align: center; margin-top: -150px; position: relative; top: -250px;}">
+<div class="allescenter">
 	<!-- Dropdown -->
 	<select bind:value={$selectedPlayer}>
 		<option value="Messi">Messi</option>
@@ -355,23 +318,36 @@
 	<div bind:this={elBarChart} />
 
 	<!-- Pie Chart Title -->
-	<h2 style="text-align: center; font-size: 20px; font-weight: bold; color: #00000;">
-		Liga and Champions League in Goals and Appearances
-	</h2>	
+	<h2>Liga and Champions League in Goals and Appearances</h2>
 
 	<!-- Pie Chart Container -->
 	<div bind:this={elPieChart} />
 
 	<!-- Line Chart Title -->
-	<h2 style="text-align: center; font-size: 20px; font-weight: bold; color: #38423B;">
-		Market Value over Time
-	</h2>	
+	<h2>Market Value over Time</h2>
 
 	<!-- Line Chart Container -->
 	<div bind:this={elLineChart} />
 </div>
 
 <style>
+	h1 {
+		font-family: 'Roboto', sans-serif;
+		text-align: center;
+		margin-top: 50px;
+		font-size: 24px;
+		font-weight: bold;
+		color: #333;
+	}
+
+	h2 {
+		font-family: 'Roboto', sans-serif;
+		text-align: center;
+		font-size: 20px;
+		font-weight: bold;
+		color: #333;
+	}
+
 	.image-wrapper {
 		display: flex;
 		justify-content: space-between;
@@ -385,5 +361,20 @@
 		height: auto;
 		display: block;
 		transition: filter 0.3s ease-in-out;
+	}
+
+	img.messi.glow {
+		filter: drop-shadow(0 0 10px #234cff);
+	}
+
+	img.ronaldo.glow {
+		filter: drop-shadow(0 0 10px #ff9000);
+	}
+
+	.allescenter {
+		text-align: center;
+		margin-top: -150px;
+		position: relative;
+		top: -250px;
 	}
 </style>
